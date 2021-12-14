@@ -1,20 +1,23 @@
 ﻿version: "3.9"
+
 services:
-
-    db:
-        image: "mcr.microsoft.com/mssql/server"
-        environment:
-            SA_PASSWORD: "ZoopLe!1$$~2"
-            ACCEPT_EULA: "Y"
-        ports:
-            - "1433:1433"
-        volumes:
-        - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-
     web:
+      image: fotoapp/latest
       build: 
          context: .
-         dockerfile: dockerfile
+         dockerfile: Fotoquest.Api/Dockerfile
       ports:
-         - "8080:5167"
-      image: fotoapp/latest
+         - 8000:80
+      depends_on:
+         - db
+
+    db:
+      image: "mcr.microsoft.com/mssql/server"
+      environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=ZoopLe!1$$~2
+      ports:
+        - 1433:1433
+        - 443:443
+    
+      

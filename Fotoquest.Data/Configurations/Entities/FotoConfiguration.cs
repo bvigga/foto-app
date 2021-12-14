@@ -12,17 +12,13 @@ namespace Fotoquest.Data.Configurations.Entities
                 new Foto
                 {
                     Id = Guid.NewGuid(),
+                    GeoDirection = "North",
+                    Width = 2018,
+                    Height = 768,
+                    
  
-                },
-                new Foto
-                {
-                    Id = Guid.NewGuid(),
-
-                },
-                new Foto
-                {
-                    Id = Guid.NewGuid(),
                 }
+
             );
         }
     }

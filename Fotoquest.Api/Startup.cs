@@ -4,6 +4,7 @@ using Fotoquest.Core.IRepository;
 using Fotoquest.Core.Repository;
 using Fotoquest.Core.Services;
 using Fotoquest.Data;
+using Fotoquest.Data.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -27,11 +28,14 @@ namespace Fotoquest.Api
         public void ConfigureServices(IServiceCollection services)
         {
             const string connectionString =
-                @"Server=localhost;Database=FotoquestDB;User=sa;Password=ZoopLe!1$~2";
+                @"Server=db;Database=FotoquestDB;User=sa;Password=ZoopLe!1$~2";
 
-            services.AddDbContext<FotoDbContext>(options =>
-                options.UseSqlServer(connectionString)
-            );
+            services.AddSqlServerDbContext<FotoDbContext>(connectionString);
+
+
+            //services.AddDbContext<FotoDbContext>(options => options
+            //    .UseSqlServer(Configuration.GetConnectionString("FotoquestConnection"),
+            //    b => b.MigrationsAssembly(typeof(FotoDbContext).Assembly.FullName)));
 
 
             services.AddMemoryCache();
@@ -84,6 +88,9 @@ namespace Fotoquest.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+
+            app.EnsureDatabase();
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

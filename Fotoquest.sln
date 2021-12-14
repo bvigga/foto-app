@@ -12,7 +12,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{22D82FE6-C8B9-48FB-8F5B-D5E2011D8B31}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
-		init.sql = init.sql
 	EndProjectSection
 EndProject
 Global

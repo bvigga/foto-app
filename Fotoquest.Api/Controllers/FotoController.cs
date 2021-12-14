@@ -91,10 +91,11 @@ namespace Fotoquest.Api.Controllers
                             Directory.CreateDirectory(path);
                         }
                         using (FileStream fileStream = System.IO.File.Create(path + fotoDTO.Fotos.FileName))
-                        {
+                            {
                             fotoDTO.Fotos.CopyTo(fileStream);
                             fileStream.Flush();
                             foto = _mapper.Map<Foto>(fotoDTO);
+                            foto.ImageUrl = path + fotoDTO.Fotos.FileName;
                             await _unitOfWork.Fotos.Insert(foto);
                             await _unitOfWork.Save();
                         }

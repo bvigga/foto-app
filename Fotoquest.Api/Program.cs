@@ -48,5 +48,92 @@ namespace Fotoquest.Api
                 .UseContentRoot(CurrentDirectory)
                 .UseSerilog()
                 .UseKestrel();
+
+        //    public async static Task Main(string[] args)
+        //    {
+        //        Log.Logger = new LoggerConfiguration()
+        //            .WriteTo.Console()
+        //            .MinimumLevel.Debug()
+        //            .CreateLogger();
+
+
+        //        var configuration = BuildConfiguration(args);
+
+        //        var host = ConfigureWebHost(configuration).Build();
+        //        using var scope = host.Services.CreateScope();
+        //        var services = scope.ServiceProvider;
+
+        //        try
+        //        {
+        //            var dbContext = services.GetRequiredService<FotoDbContext>();
+
+        //            if (dbContext.Database.IsSqlServer())
+        //            {
+        //                dbContext.Database.Migrate();
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        //            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+
+        //            throw;
+        //        }
+
+        //        await host.RunAsync();
+        //    }
+
+        //    private static IConfiguration BuildConfiguration(string[] args)
+        //        => new ConfigurationBuilder()
+        //            .SetBasePath(CurrentDirectory)
+        //            .Build();
+
+        //    private static IWebHostBuilder ConfigureWebHost(
+        //        IConfiguration configuration)
+        //        => new WebHostBuilder()
+        //            .UseStartup<Startup>()
+        //            .UseConfiguration(configuration)
+        //            .UseContentRoot(CurrentDirectory)
+        //            .UseSerilog()
+        //            .UseKestrel();
+
+        //}
+
+        //public async static Task Main(string[] args)
+        //{
+        //    var host = CreateHostBuilder(args).Build();
+
+        //    using var scope = host.Services.CreateScope();
+        //    var services = scope.ServiceProvider;
+
+        //    try
+        //    {
+        //        var dbContext = services.GetRequiredService<FotoDbContext>();
+
+        //        if (dbContext.Database.IsSqlServer())
+        //        {
+        //            dbContext.Database.Migrate();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        //        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+
+        //        throw;
+        //    }
+
+        //    await host.RunAsync();
+        //}
+
+        //public static IHostBuilder CreateHostBuilder(string[] args) =>
+        //    Host.CreateDefaultBuilder(args)
+        //        .ConfigureWebHostDefaults(webBuilder =>
+        //        {
+        //            webBuilder.UseStartup<Startup>();
+        //        });
     }
+
 }
