@@ -16,12 +16,6 @@ namespace Fotoquest.Core.DTOs
 
         public double? Longitude { get; set; }
 
-        [Required]
-        public double Height { get; set; }
-
-        [Required]
-        public double Width { get; set; }
-
         //[Required]
         public string ImageUrl { get; set; }
     }
