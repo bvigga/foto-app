@@ -49,56 +49,54 @@ namespace Fotoquest.Api
                 .UseSerilog()
                 .UseKestrel();
 
-        //    public async static Task Main(string[] args)
+        //public static void Main(string[] args)
+        //{
+        //    Log.Logger = new LoggerConfiguration()
+        //        .WriteTo.Console()
+        //        .MinimumLevel.Debug()
+        //        .CreateLogger();
+
+
+        //    var configuration = BuildConfiguration(args);
+
+        //    var host = ConfigureWebHost(configuration).Build();
+        //    using var scope = host.Services.CreateScope();
+        //    var services = scope.ServiceProvider;
+
+        //    try
         //    {
-        //        Log.Logger = new LoggerConfiguration()
-        //            .WriteTo.Console()
-        //            .MinimumLevel.Debug()
-        //            .CreateLogger();
+        //        var dbContext = services.GetRequiredService<FotoDbContext>();
 
-
-        //        var configuration = BuildConfiguration(args);
-
-        //        var host = ConfigureWebHost(configuration).Build();
-        //        using var scope = host.Services.CreateScope();
-        //        var services = scope.ServiceProvider;
-
-        //        try
+        //        if (dbContext.Database.IsSqlServer())
         //        {
-        //            var dbContext = services.GetRequiredService<FotoDbContext>();
-
-        //            if (dbContext.Database.IsSqlServer())
-        //            {
-        //                dbContext.Database.Migrate();
-        //            }
+        //            dbContext.Database.Migrate();
         //        }
-        //        catch (Exception ex)
-        //        {
-        //            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
-        //            logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        //        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
 
-        //            throw;
-        //        }
-
-        //        await host.RunAsync();
+        //        throw;
         //    }
 
-        //    private static IConfiguration BuildConfiguration(string[] args)
-        //        => new ConfigurationBuilder()
-        //            .SetBasePath(CurrentDirectory)
-        //            .Build();
-
-        //    private static IWebHostBuilder ConfigureWebHost(
-        //        IConfiguration configuration)
-        //        => new WebHostBuilder()
-        //            .UseStartup<Startup>()
-        //            .UseConfiguration(configuration)
-        //            .UseContentRoot(CurrentDirectory)
-        //            .UseSerilog()
-        //            .UseKestrel();
-
+        //    host.Run();
         //}
+
+        //private static IConfiguration BuildConfiguration(string[] args)
+        //    => new ConfigurationBuilder()
+        //        .SetBasePath(CurrentDirectory)
+        //        .Build();
+
+        //private static IWebHostBuilder ConfigureWebHost(
+        //    IConfiguration configuration)
+        //    => new WebHostBuilder()
+        //        .UseStartup<Startup>()
+        //        .UseConfiguration(configuration)
+        //        .UseContentRoot(CurrentDirectory)
+        //        .UseSerilog()
+        //        .UseKestrel();
 
         //public async static Task Main(string[] args)
         //{

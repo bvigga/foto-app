@@ -28,14 +28,11 @@ namespace Fotoquest.Api
         public void ConfigureServices(IServiceCollection services)
         {
             const string connectionString =
-                @"Server=db;Database=FotoquestDB;User=sa;Password=ZoopLe!1$~2";
+                @"Server=.\;Database=FotoquestDB;User=sa;Password=ZoopLe!1$~2";
+            //const string connectionString =
+            //    @"Server=.\SPC182060;Database=FotoquestDB;Trusted_Connection=True;MultipleActiveResultSets=true";
 
             services.AddSqlServerDbContext<FotoDbContext>(connectionString);
-
-
-            //services.AddDbContext<FotoDbContext>(options => options
-            //    .UseSqlServer(Configuration.GetConnectionString("FotoquestConnection"),
-            //    b => b.MigrationsAssembly(typeof(FotoDbContext).Assembly.FullName)));
 
 
             services.AddMemoryCache();

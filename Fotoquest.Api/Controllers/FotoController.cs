@@ -11,11 +11,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.IO;
-using Microsoft.AspNetCore.Hosting;
 //using Microsoft.Extensions.Caching.Distributed;
 using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Fotoquest.Api.Controllers
 {
@@ -26,8 +26,8 @@ namespace Fotoquest.Api.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<FotoController> _logger;
         private readonly IMapper _mapper;
-        private readonly IWebHostEnvironment _webHostEnv;
-       // private readonly IDistributedCache _cache;
+        private readonly IHostingEnvironment _env;
+        // private readonly IDistributedCache _cache;
         private static readonly int[] SupportedSizes = { 128, 512, 2048 };
 
         private static int SanitizeSize(int value)
@@ -38,14 +38,14 @@ namespace Fotoquest.Api.Controllers
 
         public FotoController(IUnitOfWork unitOfWork,
             ILogger<FotoController> logger,
-            IWebHostEnvironment webHostEnv,
+            IHostingEnvironment env,
             //IDistributedCache cache,
             IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
-            _webHostEnv = webHostEnv;
+            _env = env;
             //_cache = cache;
         }
 
@@ -84,8 +84,10 @@ namespace Fotoquest.Api.Controllers
                 // {
                     try
                     {
-                        string path = _webHostEnv.WebRootPath + "\\images\\";
-                        var foto = new Foto();
+                        //var path = $"{Directory.GetCurrentDirectory()}{@"\wwwroot\images"}";
+
+                    var path = Path.Combine(_env.WebRootPath , "images");
+                    var foto = new Foto();
                         if (!Directory.Exists(path))
                         {
                             Directory.CreateDirectory(path);
@@ -95,7 +97,7 @@ namespace Fotoquest.Api.Controllers
                             fotoDTO.Fotos.CopyTo(fileStream);
                             fileStream.Flush();
                             foto = _mapper.Map<Foto>(fotoDTO);
-                            foto.ImageUrl = path + fotoDTO.Fotos.FileName;
+                            foto.ImageUrl = Path.Combine(path , fotoDTO.Fotos.FileName);
                             await _unitOfWork.Fotos.Insert(foto);
                             await _unitOfWork.Save();
                         }
@@ -192,14 +194,17 @@ namespace Fotoquest.Api.Controllers
                     height = SanitizeSize(height);
                 }
 
-                var imagePath = System.IO.File.Create(fotoDTO.Fotos.FileName);
-                var fileInfo = _webHostEnv.WebRootPath + imagePath;
+                //var path = Path.Combine(_env.WebRootPath, "images", $"{fotoDTO.Fotos.FileName}");
+                //var imageFileStream = System.IO.File.OpenRead(path);
+
+                //var imagePath = System.IO.File.Create(fotoDTO.ImageUrl);
+                //var fileInfo = _webHostEnv.WebRootPath + imagePath;
 
                 byte[] data = null;
 
                 using (var outputStream = new MemoryStream())
                 {
-                    using (var inputStream = System.IO.File.Create(fileInfo))
+                    using (var inputStream = System.IO.File.Create(fotoDTO.ImageUrl))
                     using (var image = Image.Load(inputStream))
                     {
                         image.Mutate(x => x.Resize(width, height));

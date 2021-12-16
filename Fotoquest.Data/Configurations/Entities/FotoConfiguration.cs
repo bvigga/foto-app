@@ -13,9 +13,6 @@ namespace Fotoquest.Data.Configurations.Entities
                 {
                     Id = Guid.NewGuid(),
                     GeoDirection = "North",
-                    Width = 2018,
-                    Height = 768,
-                    
  
                 }
 
