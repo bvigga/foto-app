@@ -16,7 +16,6 @@ using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Microsoft.AspNetCore.Hosting;
-
 namespace Fotoquest.Api.Controllers
 {
     [Route("api/[controller]")]
@@ -29,13 +28,13 @@ namespace Fotoquest.Api.Controllers
         private readonly IHostingEnvironment _env;
         // private readonly IDistributedCache _cache;
         private static readonly int[] SupportedSizes = { 128, 512, 2048 };
-
+ 
         private static int SanitizeSize(int value)
         {
             if (value >= 2048) { return 2048; }
             return SupportedSizes.First(size => size >= value);
         }
-
+ 
         public FotoController(IUnitOfWork unitOfWork,
             ILogger<FotoController> logger,
             IHostingEnvironment env,
@@ -48,8 +47,9 @@ namespace Fotoquest.Api.Controllers
             _env = env;
             //_cache = cache;
         }
-
+ 
         [HttpGet]
+        [Route("allfotos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFotos([FromQuery] RequestParams requestParams)
@@ -58,8 +58,8 @@ namespace Fotoquest.Api.Controllers
             var results = _mapper.Map<IList<FotoDTO>>(fotos);
             return Ok(results);
         }
-
-        [HttpGet("{id:Guid}/{width}/{height}", Name = "GetFoto")]
+ 
+        [HttpGet("{id:Guid}/{width}/{height}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFoto(Guid id, int width, int height)
@@ -70,9 +70,10 @@ namespace Fotoquest.Api.Controllers
             if(result2 is null) { return BadRequest(); }
             return Ok(result2);
         }
-
+ 
         //[Authorize(Roles = "Administrator")]
         [HttpPost]
+        [Route("postfoto")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -92,7 +93,9 @@ namespace Fotoquest.Api.Controllers
                         {
                             Directory.CreateDirectory(path);
                         }
-                        using (FileStream fileStream = System.IO.File.Create(path + fotoDTO.Fotos.FileName))
+
+                        var fileInfo = Path.Combine(path, fotoDTO.Fotos.FileName);
+                        using (FileStream fileStream = System.IO.File.Create(fileInfo))
                             {
                             fotoDTO.Fotos.CopyTo(fileStream);
                             fileStream.Flush();
@@ -101,7 +104,7 @@ namespace Fotoquest.Api.Controllers
                             await _unitOfWork.Fotos.Insert(foto);
                             await _unitOfWork.Save();
                         }
-
+ 
                         return CreatedAtRoute("GetFoto", new { id = foto.Id }, foto);
                     }
                     catch (Exception ex)
@@ -115,7 +118,7 @@ namespace Fotoquest.Api.Controllers
             _logger.LogError($"Invalid POST attempt in {nameof(CreateFoto)}");
             return BadRequest(ModelState);
         }
-
+ 
         //[Authorize]
         [HttpPut("{id:Guid}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -128,23 +131,23 @@ namespace Fotoquest.Api.Controllers
                 _logger.LogError($"Invalid UPDATE attempt in {nameof(UpdateFoto)}");
                 return BadRequest(ModelState);
             }
-
-
+ 
+ 
             var foto = await _unitOfWork.Fotos.Get(q => q.Id == id);
             if (foto == null)
             {
                 _logger.LogError($"Invalid UPDATE attempt in {nameof(UpdateFoto)}");
                 return BadRequest("Submitted data is invalid");
             }
-
+ 
             _mapper.Map(fotoDTO, foto);
             _unitOfWork.Fotos.Update(foto);
             await _unitOfWork.Save();
-
+ 
             return NoContent();
-
+ 
         }
-
+ 
         //[Authorize]
         [HttpDelete("{id:Guid}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -157,21 +160,21 @@ namespace Fotoquest.Api.Controllers
                 _logger.LogError($"Invalid DELETE attempt in {nameof(DeleteFoto)}");
                 return BadRequest();
             }
-
+ 
             var foto = await _unitOfWork.Fotos.Get(q => q.Id == id);
             if (foto == null)
             {
                 _logger.LogError($"Invalid DELETE attempt in {nameof(DeleteFoto)}");
                 return BadRequest("Submitted data is invalid");
             }
-
+ 
             await _unitOfWork.Fotos.Delete(id);
             await _unitOfWork.Save();
-
+ 
             return NoContent();
-
+ 
         }
-
+ 
         /// <summary>
         /// Takes an image and returns a byte stream of resized image.
         /// This is done on the fly as the image is being requested.
@@ -201,7 +204,7 @@ namespace Fotoquest.Api.Controllers
                 //var fileInfo = _webHostEnv.WebRootPath + imagePath;
 
                 byte[] data = null;
-
+ 
                 using (var outputStream = new MemoryStream())
                 {
                     using (var inputStream = System.IO.File.Create(fotoDTO.ImageUrl))
@@ -210,13 +213,13 @@ namespace Fotoquest.Api.Controllers
                         image.Mutate(x => x.Resize(width, height));
                         image.SaveAsJpeg(outputStream);
                     }
-
+ 
                     data = outputStream.ToArray();
                 }
                     return data;
             }
             return null;
         }
-
+ 
     }
 }
