@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.IO;
-//using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -26,7 +26,7 @@ namespace Fotoquest.Api.Controllers
         private readonly ILogger<FotoController> _logger;
         private readonly IMapper _mapper;
         private readonly IHostingEnvironment _env;
-        // private readonly IDistributedCache _cache;
+         private readonly IDistributedCache _cache;
         private static readonly int[] SupportedSizes = { 128, 512, 2048 };
  
         private static int SanitizeSize(int value)
@@ -38,18 +38,17 @@ namespace Fotoquest.Api.Controllers
         public FotoController(IUnitOfWork unitOfWork,
             ILogger<FotoController> logger,
             IHostingEnvironment env,
-            //IDistributedCache cache,
+            IDistributedCache cache,
             IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
             _env = env;
-            //_cache = cache;
+            _cache = cache;
         }
  
         [HttpGet]
-        [Route("allfotos")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetFotos([FromQuery] RequestParams requestParams)
@@ -66,14 +65,14 @@ namespace Fotoquest.Api.Controllers
         {
             var foto = await _unitOfWork.Fotos.Get(q => q.Id == id);
             var result = _mapper.Map<FotoDTO>(foto);
-            var result2 = ResizeImage(result, width, height);
+            var result2 = await ResizeImage(result, width, height);
             if(result2 is null) { return BadRequest(); }
+
             return Ok(result2);
         }
  
         //[Authorize(Roles = "Administrator")]
         [HttpPost]
-        [Route("postfoto")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -183,41 +182,36 @@ namespace Fotoquest.Api.Controllers
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
-        private byte[] ResizeImage(FotoDTO fotoDTO, int width, int height)
+        private async  Task<byte[]> ResizeImage(FotoDTO fotoDTO, int width, int height)
         {
             if (width >= 0 && height >= 0 && (width != 0 || height != 0))
             {
-                if (height == 0)
+                var key = $"/{width}/{height}/{fotoDTO.ImageUrl}";
+                var data =  await _cache.GetAsync(key);
+
+                if (data == null)
                 {
-                    width = SanitizeSize(width);
-                }
-                else
-                {
-                    width = 0;
-                    height = SanitizeSize(height);
-                }
-
-                //var path = Path.Combine(_env.WebRootPath, "images", $"{fotoDTO.Fotos.FileName}");
-                //var imageFileStream = System.IO.File.OpenRead(path);
-
-                //var imagePath = System.IO.File.Create(fotoDTO.ImageUrl);
-                //var fileInfo = _webHostEnv.WebRootPath + imagePath;
-
-                byte[] data = null;
  
-                using (var outputStream = new MemoryStream())
-                {
-                    using (var inputStream = System.IO.File.Create(fotoDTO.ImageUrl))
-                    using (var image = Image.Load(inputStream))
+                    using (var outputStream = new MemoryStream())
                     {
-                        image.Mutate(x => x.Resize(width, height));
-                        image.SaveAsJpeg(outputStream);
+                        using (var inputStream = System.IO.File.OpenRead(fotoDTO.ImageUrl))
+                        using (var image = Image.Load(inputStream))
+                        {
+                            image.Mutate(x => x.Resize(width, height));
+                            image.SaveAsJpeg(outputStream);
+                        }
+    
+                        data = outputStream.ToArray();
                     }
- 
-                    data = outputStream.ToArray();
-                }
-                    return data;
+
+                        await _cache.SetAsync(key, data);
+                        
+                    }
+
+                return data;
+
             }
+
             return null;
         }
  

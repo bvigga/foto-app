@@ -1,3 +1,4 @@
+using System;
 using AspNetCoreRateLimit;
 using Fotoquest.Core;
 using Fotoquest.Core.IRepository;
@@ -7,6 +8,7 @@ using Fotoquest.Data;
 using Fotoquest.Data.Configurations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +30,7 @@ namespace Fotoquest.Api
         public void ConfigureServices(IServiceCollection services)
         {
             const string connectionString =
-                @"Server=.\;Database=FotoquestDB;User=sa;Password=ZoopLe!1$~2";
+                @"Server=db;Database=FotoquestDB;User=sa;Password=ZoopLe!1$~2";
             //const string connectionString =
             //    @"Server=.\SPC182060;Database=FotoquestDB;Trusted_Connection=True;MultipleActiveResultSets=true";
 
@@ -36,6 +38,14 @@ namespace Fotoquest.Api
 
 
             services.AddMemoryCache();
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             services.ConfigureRateLimiting();
             services.AddHttpContextAccessor();
@@ -98,6 +108,7 @@ namespace Fotoquest.Api
 
             app.ConfigureExceptionHandler();
 
+            app.UseSession();
             app.UseHttpsRedirection();
 
             app.UseCors("AllowAll");

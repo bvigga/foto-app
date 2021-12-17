@@ -16,7 +16,7 @@ namespace Fotoquest.Data.Configurations
 
         private static void EnsureContextIsMigrated(DbContext context)
         {
-            context.Database.EnsureDeleted();
+            //context.Database.EnsureDeleted();
 
             if (!context.Database.EnsureCreated())
                 context.Database.Migrate();
